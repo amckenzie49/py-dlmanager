@@ -2,6 +2,7 @@ import shelve
 from pathlib import Path
 from typing import Any, Dict, Optional
 from config import settings
+from models import Download
 
 
 class DownloadStorage:
@@ -13,22 +14,11 @@ class DownloadStorage:
             db_path = settings.shelve_db_path
         Path(db_path).parent.mkdir(parents=True, exist_ok=True)
         self.db_path = db_path
-        self.db = None
-
-    def open(self):
-        """Open the shelve database"""
-        self.db = shelve.open(self.db_path)
-
-    def close(self):
-        """Close the shelve database"""
-        if self.db:
-            self.db.close()
 
     def get_all(self) -> Dict[str, Any]:
         """Get all downloads"""
-        if not self.db:
-            return {}
-        return dict(self.db)
+        with shelve.open(self.db_path) as db:
+            return dict(db)
 
     def get(self, key: str) -> Optional[Any]:
         """Get a download by key"""
@@ -58,6 +48,28 @@ class DownloadStorage:
         if not self.db:
             return False
         return key in self.db
+
+    def set_download(self, download: Download):
+        """Save or update a download with validation"""
+        # Store as dict for shelve compatibility, use _id as key
+        with shelve.open(self.db_path) as db:
+            db[download.id] = download.model_dump()
+            db.sync()
+
+    def get_download(self, download_id: str) -> Optional[Download]:
+        """Get a download by ID and return as Download object"""
+        if not self.db:
+            return None
+        data = self.db.get(download_id)
+        if data is None:
+            return None
+        return Download(**data)
+
+    def get_all_downloads(self) -> Dict[str, Download]:
+        """Get all downloads as Download objects"""
+        if not self.db:
+            return {}
+        return {k: Download(**v) for k, v in self.db.items()}
 
 
 # Global storage instance

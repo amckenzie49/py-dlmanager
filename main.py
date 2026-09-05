@@ -1,25 +1,12 @@
 from fastapi import FastAPI
-from contextlib import asynccontextmanager
 from storage import storage
 from config import settings
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup logic
-    print("Application startup")
-    storage.open()
-    yield
-    # Shutdown logic
-    print("Application shutdown")
-    storage.close()
-
+from models import Download, DownloadCreate
 
 app = FastAPI(
     title=settings.app_name,
     description="A FastAPI application for managing a list of downloads",
     version=settings.app_version,
-    lifespan=lifespan,
 )
 
 
@@ -38,29 +25,26 @@ async def health_check():
 @app.get("/downloads")
 async def get_downloads():
     """Get all downloads"""
-    downloads = storage.get_all()
-    return {"downloads": downloads}
+    downloads = storage.get_all_downloads()
+    return {"downloads": list(downloads.values())}
 
 
 @app.get("/downloads/{download_id}")
 async def get_download(download_id: str):
     """Get a specific download by ID"""
-    download = storage.get(download_id)
+    download = storage.get_download(download_id)
     if download is None:
         return {"error": "Download not found"}, 404
-    return {"download_id": download_id, "data": download}
+    return download
 
 
 @app.post("/downloads")
-async def create_download(download: dict):
+async def create_download(download_data: DownloadCreate):
     """Create a new download"""
-    # Assume 'id' is provided in the download dict
-    download_id = download.get("id")
-    if not download_id:
-        return {"error": "Download must include 'id' field"}, 400
-
-    storage.set(download_id, download)
-    return {"download_id": download_id, "download": download}
+    # Convert to Download (auto-generates ID)
+    download = Download(**download_data.model_dump())
+    storage.set_download(download)
+    return download
 
 
 @app.delete("/downloads/{download_id}")
