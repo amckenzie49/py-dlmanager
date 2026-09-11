@@ -15,11 +15,6 @@ class DownloadStorage:
         Path(db_path).parent.mkdir(parents=True, exist_ok=True)
         self.db_path = db_path
 
-    def get_all(self) -> Dict[str, Any]:
-        """Get all downloads"""
-        with shelve.open(self.db_path) as db:
-            return dict(db)
-
     def get(self, key: str) -> Optional[Any]:
         """Get a download by key"""
         if not self.db:
@@ -67,9 +62,8 @@ class DownloadStorage:
 
     def get_all_downloads(self) -> Dict[str, Download]:
         """Get all downloads as Download objects"""
-        if not self.db:
-            return {}
-        return {k: Download(**v) for k, v in self.db.items()}
+        with shelve.open(self.db_path) as db:
+            return {k: Download(**v) for k, v in db.items()}
 
 
 # Global storage instance
