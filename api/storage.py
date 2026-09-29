@@ -1,8 +1,8 @@
 import shelve
 from pathlib import Path
 from typing import Any, Dict, Optional
-from config import settings
-from models import Download
+from api.config import settings
+from api.models import Download
 
 
 class DownloadStorage:

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from storage import storage
-from config import settings
-from models import Download, DownloadCreate
+from api.storage import storage
+from api.config import settings
+from api.models import Download, DownloadCreate
 
 app = FastAPI(
     title=settings.app_name,
