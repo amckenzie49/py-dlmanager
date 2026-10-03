@@ -93,6 +93,8 @@ h1 em { font-family: 'Newsreader', serif; font-weight: 500; }
 .download-icon.status-completed { color: #47703b; background: #e6f0dc; }
 .download-icon.status-failed { color: #aa4b40; background: #f8e8e4; }
 .download-icon.status-pending { color: #927632; background: #f4efdc; }
+.download-icon.status-ready { color: #567c45; background: #e6f0dc; }
+.download-icon.status-transferring { color: #63809a; background: #e8eff3; }
 .download-details { flex: 1; min-width: 0; }
 .download-title-line { display: flex; align-items: center; gap: 9px; min-width: 0; }
 .download-details h2 { min-width: 0; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 700; }
@@ -104,6 +106,8 @@ h1 em { font-family: 'Newsreader', serif; font-weight: 500; }
 .status-text-completed { color: #567c45; }.status-text-completed i { background: #75a453; }
 .status-text-failed { color: #aa4b40; }.status-text-failed i { background: #ce7163; }
 .status-text-debridding { color: #63809a; }.status-text-debridding i { background: #83a9c6; }
+.status-text-ready { color: #567c45; }.status-text-ready i { background: #75a453; }
+.status-text-transferring { color: #63809a; }.status-text-transferring i { background: #83a9c6; }
 .file-link { color: #718168; display: grid; place-items: center; }
 .file-link:hover { color: #314c28; }
 .list-message { min-height: 150px; display: flex; align-items: center; justify-content: center; gap: 11px; color: #7f887e; font-size: 12px; }

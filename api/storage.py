@@ -17,32 +17,28 @@ class DownloadStorage:
 
     def get(self, key: str) -> Optional[Any]:
         """Get a download by key"""
-        if not self.db:
-            return None
-        return self.db.get(key)
+        with shelve.open(self.db_path) as db:
+            return db.get(key)
 
     def set(self, key: str, value: Any):
         """Save or update a download"""
-        if not self.db:
-            raise RuntimeError("Database not initialized. Call open() first.")
-        self.db[key] = value
-        self.db.sync()  # Ensure data is written to disk
+        with shelve.open(self.db_path) as db:
+            db[key] = value
+            db.sync()
 
     def delete(self, key: str) -> bool:
         """Delete a download by key"""
-        if not self.db:
-            return False
-        if key in self.db:
-            del self.db[key]
-            self.db.sync()
+        with shelve.open(self.db_path) as db:
+            if key not in db:
+                return False
+            del db[key]
+            db.sync()
             return True
-        return False
 
     def exists(self, key: str) -> bool:
         """Check if a key exists"""
-        if not self.db:
-            return False
-        return key in self.db
+        with shelve.open(self.db_path) as db:
+            return key in db
 
     def set_download(self, download: Download):
         """Save or update a download with validation"""
@@ -53,12 +49,11 @@ class DownloadStorage:
 
     def get_download(self, download_id: str) -> Optional[Download]:
         """Get a download by ID and return as Download object"""
-        if not self.db:
-            return None
-        data = self.db.get(download_id)
-        if data is None:
-            return None
-        return Download(**data)
+        with shelve.open(self.db_path) as db:
+            data = db.get(download_id)
+            if data is None:
+                return None
+            return Download(**data)
 
     def get_all_downloads(self) -> Dict[str, Download]:
         """Get all downloads as Download objects"""

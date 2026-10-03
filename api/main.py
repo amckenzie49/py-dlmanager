@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from fastapi import BackgroundTasks, FastAPI
 from api.storage import storage
 from api.config import settings
 from api.models import Download, DownloadCreate
+from api.workflow import process_download
 
 app = FastAPI(
     title=settings.app_name,
@@ -39,11 +40,12 @@ async def get_download(download_id: str):
 
 
 @app.post("/downloads")
-async def create_download(download_data: DownloadCreate):
+async def create_download(download_data: DownloadCreate, background_tasks: BackgroundTasks):
     """Create a new download"""
     # Convert to Download (auto-generates ID)
     download = Download(**download_data.model_dump())
     storage.set_download(download)
+    background_tasks.add_task(process_download, download.id)
     return download
 
 

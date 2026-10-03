@@ -1,7 +1,12 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional
+from typing import Literal, Optional
 from uuid import uuid4
+
+
+DownloadStatus = Literal[
+    "pending", "debridding", "ready", "transferring", "completed", "failed"
+]
 
 
 class Download(BaseModel):
@@ -20,9 +25,9 @@ class Download(BaseModel):
         default=None, description="Magnet link for torrent downloads"
     )
     filename: Optional[str] = Field(default=None, description="Target filename")
-    status: str = Field(
+    status: DownloadStatus = Field(
         default="pending",
-        description="Download status (pending, debridding, completed, failed)",
+        description="Current debrid and transfer state",
     )
     error_message: Optional[str] = Field(
         default=None, description="Error message if status is failed"
@@ -30,9 +35,17 @@ class Download(BaseModel):
     created_at: datetime = Field(
         default_factory=datetime.now, description="When download was created"
     )
+    updated_at: datetime = Field(
+        default_factory=datetime.now, description="When the download state last changed"
+    )
+    progress: float = Field(default=0, ge=0, le=100)
+    provider_id: Optional[str] = None
+    provider_type: Optional[Literal["torrent", "webdl"]] = None
+    destination_path: Optional[str] = None
+    transferred_files: list[str] = Field(default_factory=list)
     file_url: Optional[str] = Field(
         default=None,
-        description="File share URL for the downloaded file if it is completed",
+        description="WebDAV URL for the transferred file when completed",
     )
 
 

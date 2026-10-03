@@ -3,6 +3,7 @@ import { ArrowDownToLine, ArrowUpRight, Check, CircleAlert, Clock3, FileDown, Li
 import { Link, NavLink, Route, Routes, useNavigate } from 'react-router-dom'
 
 type SourceType = 'url' | 'info_hash' | 'magnet_link'
+type DownloadStatus = 'pending' | 'debridding' | 'ready' | 'transferring' | 'completed' | 'failed'
 
 type Download = {
   id: string
@@ -10,7 +11,7 @@ type Download = {
   info_hash: string | null
   magnet_link: string | null
   filename: string | null
-  status: string
+  status: DownloadStatus
   error_message: string | null
   created_at: string
   file_url: string | null
@@ -161,7 +162,11 @@ function DownloadStatusPage() {
     }
   }
 
-  useEffect(() => { void loadDownloads() }, [])
+  useEffect(() => {
+    void loadDownloads()
+    const interval = window.setInterval(() => { void loadDownloads(true) }, 5000)
+    return () => window.clearInterval(interval)
+  }, [])
 
   return (
     <section className="status-page">
