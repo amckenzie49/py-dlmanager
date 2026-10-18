@@ -23,3 +23,11 @@ docker compose up --build -d
 Open <http://localhost:8080>. The frontend container proxies API requests to the API service. The API is not published directly to the host. Shelf data is stored in the persistent `download_data` named volume.
 
 To stop the services, run `docker compose down`. The named volume is retained; `docker compose down -v` removes it and permanently deletes the saved download queue.
+
+## Publish container images
+
+The Gitea Actions workflow builds and publishes the API and frontend images to the Gitea container registry on branch pushes, version tags (`v*`), or manual runs. Add the repository secret `REGISTRY_TOKEN` with a Gitea token that can publish packages. The workflow derives the registry host and package owner from the Gitea Actions context, and uses the triggering actor as the registry username, so the token must belong to that account.
+
+The runner must be able to reach the registry and a Docker daemon; for a local HTTP registry, configure the daemon to allow that insecure registry.
+
+Images are published as `<registry>/<owner>/py-dlmanager-api:<commit-sha>` and `<registry>/<owner>/py-dlmanager-frontend:<commit-sha>`.
