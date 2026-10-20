@@ -26,8 +26,8 @@ To stop the services, run `docker compose down`. The named volume is retained; `
 
 ## Publish container images
 
-The Gitea Actions workflow builds and publishes the API and frontend images to the Gitea container registry on branch pushes, version tags (`v*`), or manual runs. Add the repository secret `REGISTRY_TOKEN` with a Gitea token that can publish packages. The workflow derives the registry host and package owner from the Gitea Actions context, and uses the triggering actor as the registry username, so the token must belong to that account.
+The Gitea Actions workflow builds and publishes the API and frontend images to the Gitea container registry on branch pushes, version tags (`v*`), or manual runs. Add the repository secret `REGISTRY_TOKEN` with a Gitea token that can publish packages. The workflow derives the registry host from the Gitea Actions server URL (without its scheme), uses the repository path as the package owner/image namespace, and uses the triggering actor as the registry username, so the token must belong to that account.
 
 The runner must be able to reach the registry and a Docker daemon; for a local HTTP registry, configure the daemon to allow that insecure registry.
 
-Images are published as `<registry>/<owner>/py-dlmanager-api:<commit-sha>` and `<registry>/<owner>/py-dlmanager-frontend:<commit-sha>`.
+Both images are published with `latest` and the commit-SHA tag on every run. On a version-tag push such as `v1.2.3`, each image is also published with that version tag, for example `<registry>/<owner>/py-dlmanager-api:v1.2.3` and `<registry>/<owner>/py-dlmanager-frontend:v1.2.3`.
