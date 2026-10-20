@@ -23,7 +23,7 @@ jobs:
         with:
           registry: ${{ gitea.server_url }}
           username: ${{ gitea.actor }}
-          password: ${{ secrets.GITEA_TOKEN }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
 
       - name: Build and push API image
         uses: docker/build-push-action@v6
